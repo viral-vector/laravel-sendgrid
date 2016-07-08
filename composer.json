@@ -1,0 +1,25 @@
+{
+    "name": "viral-vector/laravel-sendgrid-driver",
+    "description": "This liblary utilizes Sendgrid/Sendgrid package for mail transport.",
+    "require": {
+        "illuminate/mail": "~5.0.0",
+        "sendgrid/sendgrid": "~5.0.2"
+    },
+    "require-dev": {
+        
+    },
+    "autoload": {
+        "psr-4": {
+            "ViralVector\\LaravelSendgridDriver\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "files": []
+    },
+    "authors": [
+        {
+            "name": "viralvector/viral-vector",
+            "email": "vectorviral@gmail.com"
+        }
+    ]
+}
