@@ -11,7 +11,7 @@ class MailServiceProvider extends \Illuminate\Mail\MailServiceProvider
      */
     protected function registerSwiftTransport()
     {
-        $this->app['swift.transport'] = $this->app->share(function ($app) 
+        $this->app['swift.transport'] = $this->app->bind(function ($app) 
         {
             return new TransportManager($app);
         });
