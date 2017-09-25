@@ -55,7 +55,7 @@ class SendgridTransport extends Transport
             null
         );
 
-        if(!isset($this->message->personalizations[0]))
+        if(!isset($this->message->personalization[0]))
         {
             $this->message->addPersonalization(new Personalization());
         }
@@ -81,7 +81,7 @@ class SendgridTransport extends Transport
         {   
             foreach ($data as $key => $value) 
             {
-                $this->message->personalizations[0]->addTo(new Email($value, $key));
+                $this->message->personalization[0]->addTo(new Email($value, $key));
             }  
         }
     }
@@ -111,7 +111,7 @@ class SendgridTransport extends Transport
         {
             foreach ($data as $key => $value)
             {
-                $this->message->personalizations[0]->addCc(new Email($value, $key));
+                $this->message->personalization[0]->addCc(new Email($value, $key));
             }
         }
     }
@@ -126,7 +126,7 @@ class SendgridTransport extends Transport
         {
             foreach ($data as $key => $value)
             {
-                $this->message->personalizations[0]->addBcc(new Email($value, $key));
+                $this->message->personalization[0]->addBcc(new Email($value, $key));
             }
         }
     }
@@ -139,7 +139,7 @@ class SendgridTransport extends Transport
     {
         if ($data = $message->getSubject()) 
         {
-            $this->message->personalizations[0]->setSubject($data);    
+            $this->message->personalization[0]->setSubject($data);    
         }
     }
 
