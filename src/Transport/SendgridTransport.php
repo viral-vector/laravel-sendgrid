@@ -2,9 +2,10 @@
 
 namespace ViralVector\LaravelSendgridDriver\Transport;
 
-use Swift_Transport;
+use Illuminate\Mail\Transport\Transport;
+
 use Swift_Attachment;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use Swift_Events_EventListener;
 
 use SendGrid;
@@ -13,8 +14,10 @@ use SendGrid\Email;
 use SendGrid\Content;
 use SendGrid\Personalization;
 
-class SendgridTransport implements Swift_Transport
+class SendgridTransport extends Transport
 {
+    const SMTP_API_NAME = 'sendgrid/x-smtpapi';
+
     protected $api_key;
     protected $message;
     
@@ -43,17 +46,22 @@ class SendgridTransport implements Swift_Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {   
-        $this->message = new Mail();
+        $this->message = new Mail(
+            null,
+            null,
+            null,
+            null
+        );
 
-        if(!isset($this->message->getPersonalizations()[0]))
+        if(!isset($this->message->personalizations[0]))
         {
             $this->message->addPersonalization(new Personalization());
         }
 
-        foreach ($this->methods as $method) 
-        {   
+        foreach ($this->methods as $method)
+        {
             if(method_exists($this, $method))
             {
                 call_user_func([$this, $method], $message);
@@ -65,24 +73,24 @@ class SendgridTransport implements Swift_Transport
 
      /**
       * 
-      * @param  Swift_Mime_Message $message
+      * @param  Swift_Mime_SimpleMessage $message
       */
-    protected function setTo(Swift_Mime_Message $message)
+    protected function setTo(Swift_Mime_SimpleMessage $message)
     {  
         if ($data = $message->getTo()) 
         {   
             foreach ($data as $key => $value) 
             {
-                $this->message->getPersonalizations()[0]->addTo(new Email($value, $key));   
+                $this->message->personalizations[0]->addTo(new Email($value, $key));
             }  
         }
     }
 
     /**
      * 
-     * @param  Swift_Mime_Message $message
+     * @param  Swift_Mime_SimpleMessage $message
      */
-    protected function setFrom(Swift_Mime_Message $message)
+    protected function setFrom(Swift_Mime_SimpleMessage $message)
     {   
         if ($data = $message->getFrom()) 
         {
@@ -94,83 +102,83 @@ class SendgridTransport implements Swift_Transport
     }
 
     /**
-      * 
-      * @param  Swift_Mime_Message $message
+      *
+      * @param  Swift_Mime_SimpleMessage $message
       */
-    protected function setCc(Swift_Mime_Message $message)
-    {  
-        if ($data = $message->getCc()) 
-        {   
-            foreach ($data as $key => $value) 
+    protected function setCc(Swift_Mime_SimpleMessage $message)
+    {
+        if ($data = $message->getCc())
+        {
+            foreach ($data as $key => $value)
             {
-                $this->message->getPersonalizations()[0]->addCc(new Email($value, $key));   
-            }  
+                $this->message->personalizations[0]->addCc(new Email($value, $key));
+            }
         }
     }
 
     /**
-      * 
-      * @param  Swift_Mime_Message $message
+      *
+      * @param  Swift_Mime_SimpleMessage $message
       */
-    protected function setBcc(Swift_Mime_Message $message)
-    {  
-        if ($data = $message->getBcc()) 
-        {   
-            foreach ($data as $key => $value) 
+    protected function setBcc(Swift_Mime_SimpleMessage $message)
+    {
+        if ($data = $message->getBcc())
+        {
+            foreach ($data as $key => $value)
             {
-                $this->message->getPersonalizations()[0]->addBcc(new Email($value, $key));   
-            }  
+                $this->message->personalizations[0]->addBcc(new Email($value, $key));
+            }
         }
     }
 
     /**
      * 
-     * @param  Swift_Mime_Message $message
+     * @param  Swift_Mime_SimpleMessage $message
      */
-    protected function setSubject(Swift_Mime_Message $message)
+    protected function setSubject(Swift_Mime_SimpleMessage $message)
     {
         if ($data = $message->getSubject()) 
         {
-            $this->message->getPersonalizations()[0]->setSubject($data);    
+            $this->message->personalizations[0]->setSubject($data);    
         }
     }
 
     /**
      * 
-     * @param  Swift_Mime_Message $message
+     * @param  Swift_Mime_SimpleMessage $message
      */
-    protected function setContent(Swift_Mime_Message $message)
+    protected function setContent(Swift_Mime_SimpleMessage $message)
     {   
         if ($data = $message->getBody()) 
         {
-            $this->message->addContent(new Content('text/html', $data));    
+            $this->message->addContent(new Content('text/html', $data));
         }
     }
 
     /**
-     * 
-     * @param  Swift_Mime_Message $message
+     *
+     * @param  Swift_Mime_SimpleMessage $message
      */
-    protected function setAttachment(Swift_Mime_Message $message)
-    {   
-        if ($data = $message->getChildren()) 
+    protected function setAttachment(Swift_Mime_SimpleMessage $message)
+    {
+        if ($data = $message->getChildren())
         {
-            foreach ($data as $attachment) 
+            foreach ($data as $attachment)
             {
-                if (! ($attachment instanceof Swift_Attachment) ) 
+                if (! ($attachment instanceof Swift_Attachment) )
                 {
                     continue;
                 }
 
                 // --- @TODO:: Add attachment
-            }    
+            }
         }
     }
 
     /**
      * Get a new sendgrid instance.
      *
-     * @return \SendGrid\Sendgrid
+     * @return SendGrid
      */
     protected function getSendgrid()
     {   

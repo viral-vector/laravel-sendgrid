@@ -6,12 +6,9 @@ Initialize or use an existing [Sendgrid api key](https://sendgrid.com/docs/User_
 $ composer require viral-vector/laravel-sendgrid-driver:dev-master
 ```
 
-Remove the default mail service provider and add the sendgrid service provider in config/app.php:
 ```php
 'providers' => [
-    Illuminate\Mail\MailServiceProvider::class,
-
-    ViralVector\LaravelSendgridDriver\MailServiceProvider::class,
+    ViralVector\LaravelSendgridDriver\SendgridTransportServiceProvider::class,
 ];
 ```
 
